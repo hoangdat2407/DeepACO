@@ -82,6 +82,7 @@ class ACO():
             if best_cost < self.lowest_cost:
                 self.shortest_path = paths[:, best_idx]
                 self.lowest_cost = best_cost
+                self.lowest_cost_path = paths[:, best_idx_iter]
                 if self.min_max:
                     max = self.problem_size / self.lowest_cost
                     if self.max is None:
