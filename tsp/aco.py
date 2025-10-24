@@ -25,7 +25,8 @@ class ACO():
         self.beta = beta
         self.elitist = elitist
         self.min_max = min_max
-        
+        self.lowest_cost_path = None
+                     
         if min_max:
             if min is not None:
                 assert min > 1e-9
