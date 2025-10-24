@@ -25,7 +25,7 @@ class ACO():
         self.beta = beta
         self.elitist = elitist
         self.min_max = min_max
-        self.lowest_cost_path = paths[:, best_idx]
+        self.lowest_cost_path = None
                      
         if min_max:
             if min is not None:
@@ -82,7 +82,7 @@ class ACO():
             if best_cost < self.lowest_cost:
                 self.shortest_path = paths[:, best_idx]
                 self.lowest_cost = best_cost
-                self.lowest_cost_path = paths[:, best_idx_iter]
+                self.lowest_cost_path = paths[:, best_idx]
                 if self.min_max:
                     max = self.problem_size / self.lowest_cost
                     if self.max is None:
