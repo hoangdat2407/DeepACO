@@ -25,7 +25,9 @@ class ACO():
         self.beta = beta
         self.elitist = elitist
         self.min_max = min_max
-        self.lowest_cost_path = None
+        
+        # Dòng này đã được sửa đúng từ lần trước
+        self.lowest_cost_path = None 
                      
         if min_max:
             if min is not None:
@@ -72,8 +74,11 @@ class ACO():
         costs = self.gen_path_costs(paths)
         return costs, log_probs
 
+    # === BẮT ĐẦU SỬA HÀM RUN ===
     @torch.no_grad()
-    def run(self, n_iterations):
+    def run(self, n_iterations, return_history=False): # <<< SỬA 1: Thêm return_history
+        all_time_best_costs = [] # <<< SỬA 2: Thêm list rỗng
+        
         for _ in range(n_iterations):
             paths = self.gen_path(require_prob=False)
             costs = self.gen_path_costs(paths)
@@ -82,16 +87,30 @@ class ACO():
             if best_cost < self.lowest_cost:
                 self.shortest_path = paths[:, best_idx]
                 self.lowest_cost = best_cost
-                self.lowest_cost_path = paths[:, best_idx]
+                
+                # Dòng này đã được sửa đúng từ lần trước
+                self.lowest_cost_path = paths[:, best_idx] 
+
                 if self.min_max:
                     max = self.problem_size / self.lowest_cost
                     if self.max is None:
                         self.pheromone *= max/self.pheromone.max()
                     self.max = max
             
+            # <<< SỬA 3: Thêm khối 'if' này >>>
+            if return_history:
+                # Lưu lại 'lowest_cost' ở *mỗi* vòng lặp
+                # (Dùng .item() để lấy giá trị Python thuần túy)
+                all_time_best_costs.append(self.lowest_cost.cpu().item()) 
+            
             self.update_pheronome(paths, costs)
 
-        return self.lowest_cost
+        # <<< SỬA 4: Sửa lệnh 'return' >>>
+        if return_history:
+            return self.lowest_cost, all_time_best_costs
+        else:
+            return self.lowest_cost # Trả về như cũ
+        # === KẾT THÚC SỬA HÀM RUN ===
        
     @torch.no_grad()
     def update_pheronome(self, paths, costs):
@@ -187,4 +206,6 @@ if __name__ == '__main__':
     distances[torch.arange(len(distances)), torch.arange(len(distances))] = 1e10
     aco = ACO(distances)
     aco.sparsify(k_sparse=3)
-    print(aco.run(20))
+    # Sửa lại lệnh test, truyền return_history=False (mặc định)
+    print(aco.run(20, return_history=False))
+
